@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./src/routes/v1/authRoutes.js"
 import connectDB from "./src/config/database.js"
+import errorHandler from "./src/middlewares/errorHandler.js"
 
 dotenv.config();
 const app = express();
@@ -24,6 +25,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes);
+
+app.use(errorHandler);
 
 connectDB()
 app.listen(PORT, () => {

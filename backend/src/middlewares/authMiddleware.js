@@ -21,3 +21,11 @@ export const verifyToken = (req, res, next) => {
         );
     }
 };
+
+export const isAdmin = (req, res, next) => {
+    if (req.user?.role !== "admin") {
+        return errorResponse(res, "Forbidden: Admins only", 403);
+    }
+    next();
+};
+
