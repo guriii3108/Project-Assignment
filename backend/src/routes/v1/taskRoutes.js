@@ -6,14 +6,16 @@ import {
     getAllTasksAdmin, deleteTaskAdmin,
 } from "../../controllers/taskController.js";
 import { verifyToken, isAdmin } from "../../middlewares/authMiddleware.js";
+import validate from "../../middlewares/validate.js";
+import { createTaskSchema, updateTaskSchema } from "../../validators/taskValidator.js";
 
 const router = Router();
 
 // User routes (JWT required)
-router.post("/create", verifyToken, createTask);
+router.post("/create", verifyToken,validate(createTaskSchema), createTask);
 router.get("/", verifyToken, getTasks);
 router.get("/:id", verifyToken, getTaskById);
-router.put("/:id", verifyToken, updateTask);
+router.put("/:id", verifyToken,validate(updateTaskSchema), updateTask);
 router.delete("/:id", verifyToken, deleteTask);
 
 // Admin routes (JWT + admin role required)
