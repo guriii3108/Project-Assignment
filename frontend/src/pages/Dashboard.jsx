@@ -95,11 +95,10 @@ const Dashboard = () => {
       await api.delete(`/tasks/${taskId}`);
       showSuccess("Task deleted");
       fetchTasks();
-    } catch (err) {
+    } catch {
       showError("Failed to delete task");
     }
   };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed': return 'bg-gray-100 text-gray-700 border-gray-200';
@@ -256,7 +255,11 @@ const Dashboard = () => {
                   >
                     <td className="py-4 px-6">
                       <p className="text-sm font-bold text-gray-900 mb-0.5 group-hover:text-black transition-colors">{task.title}</p>
-                      <p className="text-xs text-gray-500 truncate max-w-[250px] sm:max-w-sm font-medium">{task.description || "No description provided."}</p>
+                      {task.description ? (
+                        <p className="text-xs text-gray-500 truncate max-w-[250px] sm:max-w-sm font-medium">{task.description}</p>
+                      ) : (
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider italic">No Description</p>
+                      )}
                     </td>
                     <td className="py-4 px-6">
                       <span className={`inline-flex items-center text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border ${getStatusColor(task.status)}`}>
