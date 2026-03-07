@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { showSuccess } from "../utils/toast";
 import api from "../api/axiosInstance";
@@ -6,6 +6,7 @@ import api from "../api/axiosInstance";
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -17,12 +18,14 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="w-full bg-[#0A0A0A]/80 backdrop-blur-md border-b border-[#222222] px-6 py-4 flex items-center justify-between sticky top-0 z-50 font-sans">
-      <Link to="/dashboard" className="flex items-center gap-2 group">
-        <div className="w-8 h-8 bg-[#EDEDED] rounded-lg flex items-center justify-center text-black font-bold rotate-3 group-hover:-rotate-3 transition-transform shadow-[0_0_15px_rgba(255,255,255,0.15)]">
-          TF
+    <nav className="w-full bg-white bg-opacity-95 backdrop-blur-sm border-b border-gray-100 px-6 py-4 flex items-center justify-between sticky top-0 z-50 font-sans transition-all duration-300">
+      <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2 group">
+        <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center shadow-sm transform transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
+          <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
         </div>
-        <span className="text-xl font-semibold text-[#EDEDED] tracking-tight">
+        <span className="text-xl font-bold text-gray-900 tracking-tight transition-colors duration-300">
           TaskFlow
         </span>
       </Link>
@@ -30,33 +33,40 @@ const Navbar = () => {
       <div className="flex items-center gap-5">
         {user ? (
           <>
+            {/* User Profile Info */}
             <div className="hidden sm:flex items-center gap-3">
-              <span className="text-[#A1A1A1] text-sm font-medium">
+              <span className="text-gray-700 text-sm font-semibold">
                 {user.name}
               </span>
-              <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider ${user.role === "admin"
-                  ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
-                  : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border ${user.role === "admin"
+                  ? "bg-purple-50 text-purple-700 border-purple-200"
+                  : "bg-gray-100 text-gray-700 border-gray-200"
                 }`}>
                 {user.role}
               </span>
             </div>
-            <div className="h-5 w-px bg-[#333333] hidden sm:block"></div>
+
+            <div className="h-4 w-px bg-gray-200 hidden sm:block"></div>
+
             <button
               onClick={handleLogout}
-              className="text-sm text-[#A1A1A1] hover:text-[#EDEDED] font-medium transition-colors"
+              className="text-sm text-gray-500 hover:text-black font-semibold transition-colors"
             >
               Log out
             </button>
           </>
         ) : (
           <>
-            <Link to="/login" className="text-sm text-[#A1A1A1] hover:text-[#EDEDED] font-medium transition-colors">
-              Log in
-            </Link>
-            <Link to="/register" className="text-sm bg-[#EDEDED] text-black px-4 py-2 rounded-lg font-semibold hover:bg-white transition-all active:scale-95 shadow-[0_0_10px_rgba(255,255,255,0.05)]">
-              Get started
-            </Link>
+            {location.pathname !== "/login" && (
+              <Link to="/login" className="text-sm text-gray-500 hover:text-gray-900 font-bold transition-colors">
+                Log In
+              </Link>
+            )}
+            {location.pathname !== "/register" && (
+              <Link to="/register" className="text-sm bg-black hover:bg-gray-900 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-sm active:scale-95 flex items-center justify-center">
+                Sign Up
+              </Link>
+            )}
           </>
         )}
       </div>

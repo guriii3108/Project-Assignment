@@ -8,7 +8,7 @@ import { registerSchema, loginSchema } from "../../validators/authValidator.js";
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, //minutes in milliseconds
-    max: 2, //max attempts(from same IP)
+    max: 10, //max attempts(from same IP)
     message: { success: false, message: "Too many attempts, please try again after 15 minutes" },
     standardHeaders: true,   // sends RateLimit headers in response
     legacyHeaders: false, //old header format disabled
