@@ -1,13 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import { useAuth } from "../context/AuthContext";
 import api from "../api/axiosInstance";
 import { showSuccess, showError } from "../utils/toast";
 import { useForm, Controller } from "react-hook-form";
 import CustomSelect from "../components/CustomSelect";
 import CustomDatePicker from "../components/CustomDatePicker";
 
-const Dashboard = () => {
-  const { user } = useAuth();
+const AdminDashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,10 +26,10 @@ const Dashboard = () => {
   const fetchTasks = async () => {
     setIsLoading(true);
     try {
-      const res = await api.get("/tasks");
+      const res = await api.get("/tasks/admin/all");
       setTasks(res.data.data || []);
     } catch (err) {
-      showError("Failed to fetch tasks");
+      showError("Failed to fetch all tasks");
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -52,16 +50,8 @@ const Dashboard = () => {
         priority: task.priority,
         dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : "",
       });
-    } else {
-      reset({
-        title: "",
-        description: "",
-        status: "pending",
-        priority: "medium",
-        dueDate: "",
-      });
+      setIsPanelOpen(true);
     }
-    setIsPanelOpen(true);
   };
 
   const closePanel = () => {
@@ -73,13 +63,9 @@ const Dashboard = () => {
   const onSaveTask = async (data) => {
     try {
       if (selectedTask) {
-        // Update existing task
+        // Admin Update existing task
         await api.put(`/tasks/${selectedTask._id}`, data);
-        showSuccess("Task updated");
-      } else {
-        // Create new task
-        await api.post("/tasks/create", data);
-        showSuccess("Task created");
+        showSuccess("Task updated by Admin");
       }
       closePanel();
       fetchTasks();
@@ -90,13 +76,13 @@ const Dashboard = () => {
 
   const onDeleteTask = async (taskId, e) => {
     e.stopPropagation();
-    if (!window.confirm("Are you sure you want to delete this task?")) return;
+    if (!window.confirm("ADMIN ACTION: Are you sure you want to delete this user's task? This cannot be undone.")) return;
     try {
-      await api.delete(`/tasks/${taskId}`);
-      showSuccess("Task deleted");
+      await api.delete(`/tasks/admin/${taskId}`);
+      showSuccess("Task permanently deleted by Admin");
       fetchTasks();
     } catch {
-      showError("Failed to delete task");
+      showError("Failed to securely delete task");
     }
   };
   const getStatusColor = (status) => {
@@ -149,29 +135,20 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] font-sans pt-20 pb-20 relative overflow-hidden">
-      <main className="max-w-6xl mx-auto px-6 py-6">
+    <div className="min-h-screen bg-[#FDFDFD] font-sans pb-20 relative overflow-hidden">
+      <main className="max-w-6xl mx-auto px-6 py-10">
 
         {/* Dashboard Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-[28px] font-bold text-gray-900 tracking-tight mb-1">
-              Good morning, {user?.name || 'User'}
+            <h1 className="text-[28px] font-bold text-gray-900 tracking-tight mb-1 flex items-center gap-3">
+              Admin Dashboard
+              <span className="bg-purple-50 text-purple-700 border border-purple-200 text-xs px-2.5 py-1 rounded-full uppercase tracking-wider">System View</span>
             </h1>
             <p className="text-gray-500 font-medium text-sm">
-              Here's what needs your attention today.
+              Overview of all users and tasks across the platform.
             </p>
           </div>
-
-          <button
-            onClick={() => openPanel()}
-            className="bg-black hover:bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95 shadow-sm flex items-center justify-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
-            New Task
-          </button>
         </div>
 
         {/* 1. High-Level Stats Overview */}
@@ -239,10 +216,10 @@ const Dashboard = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="py-3.5 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-widest w-1/2">Task</th>
+                  <th className="py-3.5 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-widest w-[40%]">Task</th>
+                  <th className="py-3.5 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Owner</th>
                   <th className="py-3.5 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Status</th>
                   <th className="py-3.5 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Priority</th>
-                  <th className="py-3.5 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Due Date</th>
                   <th className="py-3.5 px-6 text-[11px] font-bold text-gray-500 uppercase tracking-widest text-right">Actions</th>
                 </tr>
               </thead>
@@ -256,10 +233,16 @@ const Dashboard = () => {
                     <td className="py-4 px-6">
                       <p className="text-sm font-bold text-gray-900 mb-0.5 group-hover:text-black transition-colors">{task.title}</p>
                       {task.description ? (
-                        <p className="text-xs text-gray-500 truncate max-w-[250px] sm:max-w-sm font-medium">{task.description}</p>
+                        <p className="text-xs text-gray-500 truncate max-w-[200px] sm:max-w-xs font-medium">{task.description}</p>
                       ) : (
                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider italic">No Description</p>
                       )}
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-gray-900">{task.owner?.name || "Unknown User"}</span>
+                        <span className="text-[10px] text-gray-500 font-medium">{task.owner?.email || "No email"}</span>
+                      </div>
                     </td>
                     <td className="py-4 px-6">
                       <span className={`inline-flex items-center text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border ${getStatusColor(task.status)}`}>
@@ -271,9 +254,6 @@ const Dashboard = () => {
                       <span className={`inline-flex items-center text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${getPriorityColor(task.priority)}`}>
                         {task.priority || "MEDIUM"}
                       </span>
-                    </td>
-                    <td className="py-4 px-6 text-sm text-gray-500 font-semibold">
-                      {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "-"}
                     </td>
                     <td className="py-4 px-6 text-right">
                       <button
@@ -453,4 +433,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;
