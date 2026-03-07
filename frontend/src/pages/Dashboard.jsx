@@ -2,7 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/axiosInstance";
 import { showSuccess, showError } from "../utils/toast";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import CustomSelect from "../components/CustomSelect";
+import CustomDatePicker from "../components/CustomDatePicker";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -18,6 +20,7 @@ const Dashboard = () => {
   const {
     register,
     handleSubmit,
+    control,
     reset,
     formState: { errors, isSubmitting },
   } = useForm();
@@ -196,8 +199,8 @@ const Dashboard = () => {
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
                 className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${activeFilter === filter
-                    ? "bg-white text-gray-900 shadow-sm border border-gray-200/50"
-                    : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/50"
+                  ? "bg-white text-gray-900 shadow-sm border border-gray-200/50"
+                  : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/50"
                   }`}
               >
                 {filter}
@@ -344,14 +347,21 @@ const Dashboard = () => {
                     Status
                   </span>
                   <div>
-                    <select
-                      {...register("status")}
-                      className="appearance-none bg-gray-50 border border-gray-200 text-gray-700 font-semibold rounded-lg px-3 py-1.5 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 min-w-[140px] cursor-pointer"
-                    >
-                      <option value="pending">Todo</option>
-                      <option value="in-progress">In Progress</option>
-                      <option value="completed">Done</option>
-                    </select>
+                    <Controller
+                      name="status"
+                      control={control}
+                      render={({ field }) => (
+                        <CustomSelect
+                          value={field.value}
+                          onChange={field.onChange}
+                          options={[
+                            { value: "pending", label: "Todo" },
+                            { value: "in-progress", label: "In Progress" },
+                            { value: "completed", label: "Done" },
+                          ]}
+                        />
+                      )}
+                    />
                   </div>
 
                   <span className="text-gray-500 font-medium flex items-center gap-2">
@@ -361,15 +371,22 @@ const Dashboard = () => {
                     Priority
                   </span>
                   <div>
-                    <select
-                      {...register("priority")}
-                      className="appearance-none bg-gray-50 border border-gray-200 text-gray-700 font-semibold rounded-lg px-3 py-1.5 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 min-w-[140px] cursor-pointer"
-                    >
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                      <option value="critical">Critical</option>
-                    </select>
+                    <Controller
+                      name="priority"
+                      control={control}
+                      render={({ field }) => (
+                        <CustomSelect
+                          value={field.value}
+                          onChange={field.onChange}
+                          options={[
+                            { value: "low", label: "Low" },
+                            { value: "medium", label: "Medium" },
+                            { value: "high", label: "High" },
+                            { value: "critical", label: "Critical" },
+                          ]}
+                        />
+                      )}
+                    />
                   </div>
 
                   <span className="text-gray-500 font-medium flex items-center gap-2">
@@ -379,10 +396,16 @@ const Dashboard = () => {
                     Due Date
                   </span>
                   <div>
-                    <input
-                      {...register("dueDate")}
-                      type="date"
-                      className="bg-gray-50 border border-gray-200 text-gray-700 font-semibold rounded-lg px-3 py-1.5 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 min-w-[140px]"
+                    <Controller
+                      name="dueDate"
+                      control={control}
+                      render={({ field }) => (
+                        <CustomDatePicker
+                          selectedDate={field.value ? new Date(field.value) : null}
+                          onChange={field.onChange}
+                          placeholderText="Select deadline"
+                        />
+                      )}
                     />
                   </div>
                 </div>
