@@ -4,6 +4,7 @@ import { showSuccess, showError } from "../utils/toast";
 import { useForm, Controller } from "react-hook-form";
 import CustomSelect from "../components/CustomSelect";
 import CustomDatePicker from "../components/CustomDatePicker";
+import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [tasks, setTasks] = useState([]);
@@ -135,12 +136,20 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] font-sans pb-20 relative overflow-hidden">
-      <main className="max-w-6xl mx-auto px-6 py-10">
+    <div className="min-h-screen bg-[#FDFDFD] font-sans pt-20 pb-20 relative overflow-hidden">
+      <main className="max-w-6xl mx-auto px-6 py-6">
 
         {/* Dashboard Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
           <div>
+            <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-indigo-600 transition-colors mb-4 group w-fit">
+              <div className="w-6 h-6 rounded-full bg-gray-100 group-hover:bg-indigo-50 flex items-center justify-center transition-colors">
+                <svg className="w-3.5 h-3.5 transform group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+              </div>
+              Back to Dashboard
+            </Link>
             <h1 className="text-[28px] font-bold text-gray-900 tracking-tight mb-1 flex items-center gap-3">
               Admin Dashboard
               <span className="bg-purple-50 text-purple-700 border border-purple-200 text-xs px-2.5 py-1 rounded-full uppercase tracking-wider">System View</span>
